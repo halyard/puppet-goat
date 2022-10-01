@@ -5,7 +5,7 @@ Description=Goatcounter analytics
 Restart=always
 ExecStart=/usr/local/bin/goatcounter serve \
           -listen localhost:8081 \
-          -db "/var/lib/goatcounter/goatcounter.sqlite3" \
+          -db "sqlite://var/lib/goatcounter/goatcounter.sqlite3" \
           -tls http
 
 [Install]
