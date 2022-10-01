@@ -2,12 +2,14 @@
 #
 # @param hostname is the hostname for the goat server
 # @param tls_account is the account details for requesting the TLS cert
+# @param admin_email is the email address to access metrics
 # @param admin_password is the password to access metrics
 # @param tls_challengealias is the domain to use for TLS cert validation
 # @param version sets the goatcounter version to use
 class goat (
   String $hostname,
   String $tls_account,
+  String $admin_email,
   String $admin_password,
   Optional[String] $tls_challengealias = undef,
   String $version = 'v2.2.3',
@@ -24,6 +26,10 @@ class goat (
   $filename = "goatcounter-dev-linux-${arch}.gz"
   $url = "https://github.com/arp242/goatcounter/releases/download/${version}/${filename}"
 
+  $dbfile = 'sqlite+/var/lib/goatcounter/goatcounter.sqlite3'
+  $dbcmd = "${binfile} db create site -createdb \
+  -vhost ${hostname} -user.email ${admin_email} -user.password ${admin_password} -db ${dbfile}"
+
   exec { 'download goatcounter':
     command => "curl -sL '${url}' | gunzip > ${binfile} && chmod a+x ${binfile}",
     unless  => '/usr/local/bin/goatcounter version | grep version=dev',
@@ -33,7 +39,7 @@ class goat (
     ensure => directory,
   }
 
-  -> exec { "${binfile} db create site -createdb -vhost ${hostname} -user.email ${admin_email} -user.password ${admin_password} -db sqlite+/var/lib/goatcounter/goatcounter.sqlite3":
+  -> exec { $dbcmd:
     creates => '/var/lib/goatcounter/goatcounter.sqlite3',
   }
 
@@ -43,8 +49,8 @@ class goat (
   }
 
   ~> service { 'goatcounter':
-    ensure  => running,
-    enable  => true,
+    ensure => running,
+    enable => true,
   }
 
   nginx::site { $hostname:
