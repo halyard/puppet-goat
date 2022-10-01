@@ -6,8 +6,9 @@ Restart=always
 User=goatcounter
 ExecStart=/usr/local/bin/goatcounter serve \
           -listen localhost:8081 \
-          -db "sqlite://var/lib/goatcounter/goatcounter.sqlite3" \
-          -tls http
+          -db "sqlite+/var/lib/goatcounter/goatcounter.sqlite3" \
+          -tls http \
+          -automigrate
 
 [Install]
 WantedBy=multi-user.target
