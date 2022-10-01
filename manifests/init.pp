@@ -30,13 +30,28 @@ class goat (
   $dbcmd = "${binfile} db create site -createdb \
   -vhost ${hostname} -user.email ${admin_email} -user.password ${admin_password} -db ${dbfile}"
 
+  group { 'goatcounter':
+    ensure => present,
+    system => true,
+  }
+
+  user { 'goatcounter':
+    ensure => present,
+    system => true,
+    gid    => 'goatcounter',
+    shell  => '/usr/bin/nologin',
+    home   => '/var/lib/goatcounter',
+  }
+
   exec { 'download goatcounter':
     command => "/usr/bin/curl -sL '${url}' | gunzip > ${binfile} && chmod a+x ${binfile}",
     unless  => '/usr/local/bin/goatcounter version | grep version=dev',
   }
 
-  -> file { '/var/lib/goatcounter':
+  -> file { ['/var/lib/goatcounter', '/var/log/goatcounter']:
     ensure => directory,
+    owner  => 'goatcounter',
+    group  => 'goatcounter',
   }
 
   -> exec { $dbcmd:

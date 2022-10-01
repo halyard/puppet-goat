@@ -3,6 +3,7 @@ Description=Goatcounter analytics
 
 [Service]
 Restart=always
+User=goatcounter
 ExecStart=/usr/local/bin/goatcounter serve \
           -listen localhost:8081 \
           -db "sqlite://var/lib/goatcounter/goatcounter.sqlite3" \
