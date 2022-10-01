@@ -55,6 +55,7 @@ class goat (
   }
 
   -> exec { $dbcmd:
+    user    => 'goatcounter',
     creates => '/var/lib/goatcounter/goatcounter.sqlite3',
   }
 
