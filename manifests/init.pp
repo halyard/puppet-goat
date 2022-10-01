@@ -31,7 +31,7 @@ class goat (
   -vhost ${hostname} -user.email ${admin_email} -user.password ${admin_password} -db ${dbfile}"
 
   exec { 'download goatcounter':
-    command => "curl -sL '${url}' | gunzip > ${binfile} && chmod a+x ${binfile}",
+    command => "/usr/bin/curl -sL '${url}' | gunzip > ${binfile} && chmod a+x ${binfile}",
     unless  => '/usr/local/bin/goatcounter version | grep version=dev',
   }
 
