@@ -1,10 +1,10 @@
 # @summary Install Goatcounter server
 #
 # @param hostname is the hostname for the goat server
-# @param tls_account is the account details for requesting the TLS cert
 # @param admin_email is the email address to access metrics
 # @param admin_password is the password to access metrics
-# @param tls_challengealias is the domain to use for TLS cert validation
+# @param aws_access_key_id sets the AWS key to use for Route53 challenge
+# @param aws_secret_access_key sets the AWS secret key to use for the Route53 challenge
 # @param version sets the goatcounter version to use
 # @param backup_target sets the target repo for backups
 # @param backup_watchdog sets the watchdog URL to confirm backups are working
@@ -12,10 +12,10 @@
 # @param backup_environment sets the env vars to use for backups
 class goat (
   String $hostname,
-  String $tls_account,
   String $admin_email,
   String $admin_password,
-  Optional[String] $tls_challengealias = undef,
+  String $aws_access_key_id,
+  String $aws_secret_access_key,
   String $version = 'v2.2.3',
   Optional[String] $backup_target = undef,
   Optional[String] $backup_watchdog = undef,
@@ -80,9 +80,10 @@ class goat (
   }
 
   nginx::site { $hostname:
-    proxy_target       => 'http://localhost:8081',
-    tls_challengealias => $tls_challengealias,
-    tls_account        => $tls_account,
+    proxy_target          => 'http://localhost:8081',
+    aws_access_key_id     => $aws_access_key_id,
+    aws_secret_access_key => $aws_secret_access_key,
+    email                 => $admin_email,
   }
 
   if $backup_target != '' {
