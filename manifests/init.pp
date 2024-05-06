@@ -55,7 +55,7 @@ class goat (
 
   exec { 'download goatcounter':
     command => "/usr/bin/curl -sL '${url}' | gunzip > ${binfile} && chmod a+x ${binfile}",
-    unless  => "test -e ${binfile} && ${binfile} version | grep version=${version}",
+    unless  => "/usr/bin/test -e ${binfile} && ${binfile} version | grep version=${version}",
   }
 
   -> file { [$dbdir, '/var/log/goatcounter']:
