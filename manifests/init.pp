@@ -31,7 +31,7 @@ class goat (
   }
 
   $binfile = '/usr/local/bin/goatcounter'
-  $filename = "goatcounter-dev-linux-${arch}.gz"
+  $filename = "goatcounter-${version}-linux-${arch}.gz"
   $url = "https://github.com/arp242/goatcounter/releases/download/${version}/${filename}"
 
   $dbdir = '/var/lib/goatcounter'
