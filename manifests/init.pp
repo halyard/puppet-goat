@@ -16,7 +16,7 @@ class goat (
   String $admin_password,
   String $aws_access_key_id,
   String $aws_secret_access_key,
-  String $version = 'v2.2.3',
+  String $version = 'v2.5.0',
   Optional[String] $backup_target = undef,
   Optional[String] $backup_watchdog = undef,
   Optional[String] $backup_password = undef,
