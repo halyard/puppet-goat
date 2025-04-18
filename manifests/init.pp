@@ -6,6 +6,10 @@
 # @param aws_access_key_id sets the AWS key to use for Route53 challenge
 # @param aws_secret_access_key sets the AWS secret key to use for the Route53 challenge
 # @param version sets the goatcounter version to use
+# @param metrics enables the mqtt-exporter sidecar container
+# @param metrics_ip sets the IP of the metrics container
+# @param prometheus_server_ip sets the ip range to allow for prometheus connections
+# @param metrics_token sets the Goatcounter token to use for authenticating the metrics job
 # @param backup_target sets the target repo for backups
 # @param backup_watchdog sets the watchdog URL to confirm backups are working
 # @param backup_password sets the encryption key for backup snapshots
@@ -17,6 +21,10 @@ class goat (
   String $aws_access_key_id,
   String $aws_secret_access_key,
   String $version = 'v2.5.0',
+  Boolean $metrics = true,
+  String $metrics_ip = '172.17.0.5',
+  String $prometheus_server_ip = '127.0.0.1/32',
+  Optional[String] $metrics_token = undef,
   Optional[String] $backup_target = undef,
   Optional[String] $backup_watchdog = undef,
   Optional[String] $backup_password = undef,
@@ -84,6 +92,32 @@ class goat (
     aws_access_key_id     => $aws_access_key_id,
     aws_secret_access_key => $aws_secret_access_key,
     email                 => $admin_email,
+  }
+
+  if $metrics {
+    firewall { '100 dnat for goatcounter-exporter':
+      chain  => 'DOCKER_EXPOSE',
+      jump   => 'DNAT',
+      proto  => 'tcp',
+      dport  => 8080,
+      source => $prometheus_server_ip,
+      todest => "${metrics_ip}:8080",
+      table  => 'nat',
+    }
+
+    $hostname_chunks = split($hostname, '.')
+    $code = $hostname_chunks[0]
+    $instance = join($hostname_chunks[1,-1], '.')
+
+    docker::container { 'goatcounter-exporter':
+      image => 'ghcr.io/dazwilkin/goatcounter-exporter:latest',
+      args  => [
+        "--ip ${metrics_ip}",
+        "-e CODE=${code}",
+        "-e TOKEN=${metrics_token}",
+      ],
+      cmd   => "--instance=${instance}",
+    }
   }
 
   if $backup_target != '' {
