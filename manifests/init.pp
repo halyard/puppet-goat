@@ -110,7 +110,7 @@ class goat (
     $instance = join($hostname_chunks[1,-1], '.')
 
     docker::container { 'goatcounter-exporter':
-      image => 'ghcr.io/dazwilkin/goatcounter-exporter:latest',
+      image => 'ghcr.io/dazwilkin/goatcounter-exporter:817059a1edaa995c24434b9abad0fad7d88fd15c',
       args  => [
         "--ip ${metrics_ip}",
         "-e CODE=${code}",
