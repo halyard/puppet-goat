@@ -105,7 +105,7 @@ class goat (
       table  => 'nat',
     }
 
-    $hostname_chunks = split($hostname, '.')
+    $hostname_chunks = split($hostname, '[.]')
     $code = $hostname_chunks[0]
     $instance = join($hostname_chunks[1,-1], '.')
 
